@@ -19,21 +19,21 @@ exports.registerAPI = async (req, res) => {
 };
 
 //login
-exports.loginAPI = async (req, res) => {
-  console.log("Inside the login API");
-  const { email, password } = req.body;
-  try {
-    const existingUser = await users.findOne({ email, password });
-    if (existingUser) {
-      const token=jwt.sign({userId:existingUser._id},process.env.jwtkey)
-      console.log(token);
+exports.loginAPI=async(req,res)=>{
+  const {email,password}=req.body
+  existingUser= await users.findOne({email:email})
+  if(existingUser){
+      if(existingUser.password==password){
+          const token = jwt.sign({userId:existingUser._id},process.env.jwtkey)
+          console.log(token);
+         res.status(200).json({currentUser:existingUser,token})
+      }else{
+          res.status(402).json("Incorrect password or email")
+          
+      }
+  }else{
+      res.status(402).json("user not registerd")
       
-      res.status(200).json({ currentUser: existingUser,token });
-    } else {
-      res.status(400).json("Incorrect Email or Password");
-    }
-  } catch (err) {
-    res.status(400).json(err);
   }
-};
 
+}
